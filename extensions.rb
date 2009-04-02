@@ -16,4 +16,8 @@ class String
     slug.tr!(' ', "-")
     slug
   end
+
+  def start_with?(str)
+    index(str) == 0
+  end
 end
