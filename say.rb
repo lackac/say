@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sinatra'
 require 'fileutils'
 require 'extensions'
+require 'iconv'
 
 configure do
   set :espeak, "/usr/bin/espeak"
@@ -19,7 +20,9 @@ get %r{^/((?:mb/)?[^/]+)/(.*)$} do |voice, text|
     end
     unless File.exists?(file.to_s)
       FileUtils.mkdir_p(file.dirname.to_s)
-      unless system %{#{options.espeak} -v #{voice} -w #{file} "#{text}"}
+      encoding = voice =~ /hu/ ? 'latin2' : 'latin1'
+      latin_text = Iconv.iconv(encoding, 'utf8', text)
+      unless system %{#{options.espeak} -v #{voice} -w #{file} "#{latin_text}"}
         raise RuntimeError, "Missing voice or other problem"
       end
     end
